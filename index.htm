@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gửi người anh yêu nhất ❤️</title>
+    <style>
+        body {
+            /* Nền tối lãng mạn */
+            background-color: #0d0d1a; 
+            color: #ffccff; /* Màu chữ sáng */
+            font-family: 'Verdana', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; 
+            position: relative; 
+        }
+
+        /* -------------------------- */
+        /* CSS cho trái tim BAN ĐẦU (có thể click) */
+        /* -------------------------- */
+        #initial-heart {
+            position: absolute;
+            width: 150px; 
+            height: 150px;
+            background: linear-gradient(45deg, #ff66cc, #ff33ff); 
+            box-shadow: 0 0 25px rgba(255, 51, 255, 0.7); 
+            transform: rotate(-45deg);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            line-height: 1.3;
+            z-index: 20; 
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out; 
+        }
+
+        #initial-heart::before,
+        #initial-heart::after {
+            content: "";
+            position: absolute;
+            width: 100%; 
+            height: 100%;
+            border-radius: 50%;
+            background: inherit; 
+        }
+        #initial-heart::before { top: -50%; left: 0; }
+        #initial-heart::after { left: 50%; top: 0; }
+
+        /* Chữ bên trong trái tim */
+        #initial-heart span {
+            position: relative;
+            z-index: 1; 
+            transform: rotate(45deg); 
+            padding: 10px;
+        }
+
+        /* Khi trái tim ban đầu ẩn đi */
+        #initial-heart.hide {
+            opacity: 0;
+            transform: scale(0.1) rotate(-45deg);
+            pointer-events: none; 
+        }
+
+        /* -------------------------- */
+        /* CSS CHO HIỆU ỨNG PHÁO TIM BÙNG NỔ */
+        /* -------------------------- */
+        .burst-particle {
+            position: absolute;
+            width: 15px; 
+            height: 15px;
+            background: linear-gradient(45deg, #ff66cc, #ff33ff); 
+            box-shadow: 0 0 8px rgba(255, 102, 204, 0.7); 
+            transform: rotate(-45deg); 
+            z-index: 15;
+            opacity: 1;
+            animation: burstMove 0.8s ease-out forwards; 
+        }
+        .burst-particle::before,
+        .burst-particle::after {
+            content: "";
+            position: absolute;
+            width: 100%; 
+            height: 100%;
+            border-radius: 50%;
+            background: inherit; 
+        }
+        .burst-particle::before { top: -50%; left: 0; }
+        .burst-particle::after { left: 50%; top: 0; }
+
+        @keyframes burstMove {
+            to {
+                opacity: 0;
+                transform: translate(var(--endX), var(--endY)) scale(0.2) rotate(calc(-45deg + 360deg)); 
+            }
+        }
+        
+        /* -------------------------- */
+        /* CSS cho nội dung lời nhắn (ban đầu ẩn) */
+        /* -------------------------- */
+        .container {
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7); 
+            padding: 40px 60px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255, 0, 100, 0.5); 
+            max-width: 80%;
+            z-index: 10; 
+            opacity: 0; /* Bắt đầu ẩn */
+            transform: translateY(20px); 
+            transition: opacity 1.5s ease-out, transform 1.5s ease-out; 
+        }
+
+        /* Khi lời nhắn hiện ra */
+        .container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        h1 { color: #ff99ff; font-size: 3em; margin-bottom: 20px; text-shadow: 0 0 10px #ff33ff; }
+        p { font-size: 1.5em; line-height: 1.6; margin-bottom: 30px; }
+        .signature { font-style: italic; font-size: 1.2em; color: #ff66cc; border-top: 1px dashed #ff66cc; padding-top: 10px; margin-top: 20px; }
+
+        /* -------------------------- */
+        /* CSS HIỆU ỨNG TRÁI TIM RƠI (THEO PHIÊN BẢN CỦA BẠN) */
+        /* -------------------------- */
+        .heart-particle { /* Đổi tên class để tránh trùng lặp */
+            position: absolute;
+            width: var(--particle-size); /* Dùng biến để JS định nghĩa */
+            height: var(--particle-size); /* Dùng biến để JS định nghĩa */
+            background: #ff66cc; /* Màu trái tim, tôi dùng màu sáng để nổi trên nền tối */
+            transform: rotate(-45deg);
+            z-index: 1; 
+            opacity: 0.8; /* Ban đầu có độ mờ */
+            animation: fall linear infinite; /* Animation sẽ được JS bổ sung duration và delay */
+        }
+
+        .heart-particle::before,
+        .heart-particle::after {
+            content: "";
+            position: absolute;
+            width: 100%; 
+            height: 100%;
+            border-radius: 50%;
+            background: inherit; /* Kế thừa màu của heart-particle */
+        }
+
+        .heart-particle::before {
+            top: -50%; /* Dùng % để tính toán dựa trên kích thước thực tế */
+            left: 0;
+        }
+
+        .heart-particle::after {
+            left: 50%; /* Dùng % để tính toán dựa trên kích thước thực tế */
+            top: 0;
+        }
+
+        /* Keyframes cho hiệu ứng rơi (theo phiên bản của bạn) */
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(-45deg); /* Giữ nguyên xoay -45deg */
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="initial-heart">
+        <span>Ấn vào đây nè iuu! ❤️</span>
+    </div>
+
+   <div class="container">
+        <h1>Gửi Em May Mắn Của Anh!</h1>
+
+        <p>
+            "Em à, hôm nay là 20/10 anh chúc em cô gái của anh sẽ luôn luôn xinh đẹp, luôn vui vẻ và hạnh phúc. Chúc mọi việc bé iuu anh muốn điều sẽ thành sự thật mọi khó khăn điều sẽ biến mất chỉ để lại niềm vui hạnh phúc cho iuu mà thôi. Anh yêu em nhiều lắm May Mắn của anh. Anh muốn được bên em yêu em cả đời này anh yêu em!"
+        </p>
+        <div class="signature">
+            Yêu em, <br>
+            Đậu của em❤️
+        </div>
+    </div>
+
+    <script>
+        const initialHeart = document.getElementById('initial-heart');
+        const messageContainer = document.querySelector('.container');
+        const body = document.body;
+        let heartRainInterval; // Đổi tên biến để tránh nhầm lẫn
+
+        // Hàm tạo hiệu ứng PHÁO TIM BÙNG NỔ
+        function createBurstEffect(centerX, centerY) {
+            const numParticles = 30; 
+            const radius = 120; 
+
+            for (let i = 0; i < numParticles; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('burst-particle');
+                
+                particle.style.left = `${centerX}px`;
+                particle.style.top = `${centerY}px`;
+
+                const angle = (i / numParticles) * Math.PI * 2;
+                const endX = Math.cos(angle) * radius * (Math.random() * 0.5 + 1); 
+                const endY = Math.sin(angle) * radius * (Math.random() * 0.5 + 1);
+
+                particle.style.setProperty('--endX', `${endX}px`);
+                particle.style.setProperty('--endY', `${endY}px`);
+
+                body.appendChild(particle);
+
+                setTimeout(() => {
+                    particle.remove();
+                }, 800); 
+            }
+        }
+
+        initialHeart.addEventListener('click', (e) => {
+            const rect = initialHeart.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            createBurstEffect(centerX, centerY);
+
+            initialHeart.classList.add('hide');
+
+            // Bắt đầu hiệu ứng trái tim rơi sau khi pháo tim bùng nổ
+            setTimeout(() => {
+                startHeartRain(); 
+            }, 600); 
+
+            // Hiển thị lời nhắn sau khi hiệu ứng trái tim đã bắt đầu một lúc
+            setTimeout(() => {
+                messageContainer.classList.add('show');
+            }, 2500); 
+        });
+
+
+        // Hàm tạo và điều khiển trái tim rơi (theo phiên bản của bạn)
+        function createHeartParticle() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-particle');
+
+            // Kích thước ngẫu nhiên (từ 10px đến 25px)
+            const size = Math.random() * 15 + 10; 
+            heart.style.setProperty('--particle-size', size + 'px'); // Dùng biến CSS
+            heart.style.width = size + 'px';
+            heart.style.height = size + 'px';
+            
+            // Vị trí xuất phát ngẫu nhiên ở phía trên
+            heart.style.left = Math.random() * 100 + 'vw';
+
+            // Tốc độ rơi và thời gian tồn tại ngẫu nhiên (từ 5s đến 15s)
+            const duration = Math.random() * 10 + 5;
+            heart.style.animationDuration = duration + 's';
+
+            // Độ trễ ngẫu nhiên để trái tim rơi không đồng loạt
+            heart.style.animationDelay = Math.random() * 5 + 's';
+
+            body.appendChild(heart);
+
+            // Xóa trái tim sau khi rơi xong để tối ưu hiệu suất
+            setTimeout(() => {
+                heart.remove();
+            }, duration * 1000);
+        }
+
+        function startHeartRain() {
+            const numberOfInitialHearts = 30; // Số lượng trái tim bắn ra ban đầu khi bắt đầu mưa
+            for (let i = 0; i < numberOfInitialHearts; i++) {
+                createHeartParticle();
+            }
+            heartRainInterval = setInterval(createHeartParticle, 300); // Tạo một trái tim mới sau mỗi 0.3 giây
+        }
+
+        // Tối ưu: Khi rời trang hoặc đóng, dừng interval để tránh lỗi
+        window.addEventListener('beforeunload', () => {
+            clearInterval(heartRainInterval);
+        });
+
+    </script>
+</body>
+</html>
+
